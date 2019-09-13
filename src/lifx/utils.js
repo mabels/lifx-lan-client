@@ -192,7 +192,7 @@ utils.rgbHexStringToObject = function(rgbHexString) {
  * @return {Number} minium of the given array
  */
 utils.minNumberInArray = function(array) {
-  return Math.min(...array);
+  return Math.min.apply(undefined, array);
 };
 
 /**
@@ -201,7 +201,7 @@ utils.minNumberInArray = function(array) {
  * @return {Number} maxinum of the given array
  */
 utils.maxNumberInArray = function(array) {
-  return Math.max(...array);
+  return Math.max.apply(undefined, array);
 };
 
 /**
