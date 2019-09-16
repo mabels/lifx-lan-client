@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const Packet = {
   size:
@@ -15,7 +15,7 @@ const Packet = {
       offset += 2;
       hsbk.kelvin = buf.readUInt16LE(offset);
       offset += 2;
-      return { offset, hsbk };
+      return {offset, hsbk};
     }
   }
 };
@@ -27,11 +27,11 @@ const Packet = {
  */
 Packet.toObject = function(buf) {
   if (buf.length !== this.size) {
-    throw new Error("Invalid length given for stateTileState64 LIFX packet");
+    throw new Error('Invalid length given for stateTileState64 LIFX packet');
   }
   let offset = 0;
   const obj = {};
-  obj.tile_index = buf.readUInt8(offset);
+  obj.tileIndex = buf.readUInt8(offset);
   offset += 1;
   obj.reserved = buf.readUInt8(offset);
   offset += 1;
@@ -41,7 +41,7 @@ Packet.toObject = function(buf) {
   offset += 1;
   obj.width = buf.readUInt8(offset);
   offset += 1;
-  obj.colors = new Array(64).fill(undefined).map((_, idx) => {
+  obj.colors = new Array(64).fill(undefined).map(() => {
     const ret = Packet.HSBK.toObject(buf, offset);
     offset = ret.offset;
     return ret.hsbk;

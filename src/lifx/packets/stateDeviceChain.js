@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const Packet = {
   size:
@@ -8,17 +8,17 @@ const Packet = {
   Tile: {
     toObject: function(buf, offset) {
       const tile = {};
-      tile.accel_meas_x = buf.readUInt16LE(offset);
+      tile.accelMeasX = buf.readUInt16LE(offset);
       offset += 2;
-      tile.accel_meas_y = buf.readUInt16LE(offset);
+      tile.accelMeasY = buf.readUInt16LE(offset);
       offset += 2;
-      tile.accel_meas_z = buf.readUInt16LE(offset);
+      tile.accelMeasZ = buf.readUInt16LE(offset);
       offset += 2;
       tile.reserved = buf.readUInt16LE(offset);
       offset += 2;
-      tile.user_x = buf.readUInt32LE(offset);
+      tile.userX = buf.readUInt32LE(offset);
       offset += 4;
-      tile.user_y = buf.readUInt32LE(offset);
+      tile.userY = buf.readUInt32LE(offset);
       offset += 4;
       tile.width = buf.readUInt8(offset);
       offset += 1;
@@ -26,29 +26,29 @@ const Packet = {
       offset += 1;
       tile.reserved = buf.readUInt8(offset);
       offset += 1;
-      tile.device_version_vendor = buf.readUInt32LE(offset);
+      tile.deviceVersionVendor = buf.readUInt32LE(offset);
       offset += 4;
-      tile.device_version_product = buf.readUInt32LE(offset);
+      tile.deviceVersionProduct = buf.readUInt32LE(offset);
       offset += 4;
-      tile.device_version_version = buf.readUInt32LE(offset);
+      tile.deviceVersionVersion = buf.readUInt32LE(offset);
       offset += 4;
-      tile.firmware_build = {
+      tile.firmwareBuild = {
         low: buf.readUInt32LE(offset),
-        high: buf.readUInt32LE(offset+2)
+        high: buf.readUInt32LE(offset + 2)
       };
       offset += 8;
       tile.reserved = {
         low: buf.readUInt32LE(offset),
-        high: buf.readUInt32LE(offset+2)
+        high: buf.readUInt32LE(offset + 2)
       };
       offset += 8;
-      tile.firmware_version_minor = buf.readUInt16LE(offset);
+      tile.firmwareVersionMinor = buf.readUInt16LE(offset);
       offset += 2;
-      tile.firmware_version_major = buf.readUInt16LE(offset);
+      tile.firmwareVersionMajor = buf.readUInt16LE(offset);
       offset += 2;
       tile.reserved = buf.readUInt32LE(offset);
       offset += 4;
-      return { offset, tile };
+      return {offset, tile};
     }
   }
 };
@@ -60,30 +60,20 @@ const Packet = {
  */
 Packet.toObject = function(buf) {
   if (buf.length !== this.size) {
-    throw new Error("Invalid length given for stateLabel LIFX packet");
+    throw new Error('Invalid length given for stateLabel LIFX packet');
   }
   let offset = 0;
   const obj = {};
-  obj.start_index = buf.readUInt8(offset);
+  obj.startIndex = buf.readUInt8(offset);
   offset += 1;
-  obj.tile_devices = new Array(16).fill(undefined).map((_, idx) => {
+  obj.tileDevices = new Array(16).fill(undefined).map(() => {
     const ret = Packet.Tile.toObject(buf, offset);
     offset = ret.offset;
     return ret.tile;
   });
-  obj.total_count = buf.readUInt8(offset);
+  obj.totalCount = buf.readUInt8(offset);
   offset += 1;
   return obj;
-};
-
-/**
- * Converts the given packet specific object into a packet
- * @param  {Object} obj object with configuration data
- * @param  {String} obj.label label to set, maximum 32 bytes
- * @return {Buffer}     packet
- */
-Packet.toBuffer = function(obj) {
-  throw new Error('not implemented yet stateDeviceChain toBuffer');
 };
 
 module.exports = Packet;

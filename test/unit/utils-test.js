@@ -155,4 +155,74 @@ suite('Utils', () => {
     assert.equal(utils.getHardwareDetails(0, 1), false);
     assert.equal(utils.getHardwareDetails(1, 0), false);
   });
+
+  test('to16Bitnumber without default', () => {
+    assert.equal(utils.to16number(6), 6);
+    assert.equal(utils.to16number(-6), 6);
+    assert.equal(utils.to16number('6'), 0);
+  });
+
+  test('to16Bitnumber with default not number', () => {
+    assert.equal(utils.to16number(6, 'xx'), 6);
+    assert.equal(utils.to16number(-6, 'xx'), 6);
+    assert.equal(utils.to16number('6', 'xx'), 0);
+  });
+
+  test('to16Bitnumber with default number', () => {
+    assert.equal(utils.to16number(6, 9), 6);
+    assert.equal(utils.to16number(-6, 9), 6);
+    assert.equal(utils.to16number('6', 9), 9);
+  });
+
+  test('to16Bitnumber with default number wrap', () => {
+    assert.equal(utils.to16number(6, 9 + 0xffff), 6);
+    assert.equal(utils.to16number(-6, 9 + 0xffff), 6);
+    assert.equal(utils.to16number('6', 9 + 0xffff), 9);
+  });
+
+  test('toColorHsbk undefined', () => {
+    assert.throw(() => utils.toColorHskb(undefined));
+  });
+
+  test('toColorHsbk empty to defaults', () => {
+    assert.deepEqual(utils.toColorHskb({}), {
+      hue: -1,
+      saturation: -1,
+      brightness: -1,
+      kelvin: -1
+    });
+  });
+
+  test('toColorHsbk set and passed', () => {
+    assert.deepEqual(utils.toColorHskb({
+      hue: 4711,
+      saturation: 4712,
+      brightness: 4713,
+      kelvin: 4714
+    }), {
+      hue: 4711,
+      saturation: 4712,
+      brightness: 4713,
+      kelvin: 4714
+    });
+  });
+  
+  test('buildColorsHsbk undefined', () => {
+    assert.throw(() => utils.buildColorsHsbk());
+  });
+
+  test('buildColorsHsbk empty', () => {
+    assert.deepEqual(utils.buildColorsHsbk([1,2]), []);
+  });
+
+  test('buildColorsHsbk def', () => {
+    assert.deepEqual(utils.buildColorsHsbk([{
+      hue: 5674
+    }], 2), [
+      {
+        hue: 5674
+      },
+      {} 
+    ]);
+  });
 });

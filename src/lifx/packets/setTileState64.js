@@ -1,77 +1,44 @@
-"use strict";
+'use strict';
 
-const { constants } = require("../../lifx");
+const {validate} = require('../../lifx');
 
 const Packet = {
-  size: 1 + 1 + 1 + 1 + 1 + 1 + 4 + 64 * (2 + 2 + 2 + 2),
+  // size: 1 + 1 + 1 + 1 + 1 + 1 + 4 + 64 * (2 + 2 + 2 + 2),
   HSBK: {
-    toBuffer(obj, buf, offset) {
-      if ((typeof obj.hue !== "number" && obj.hue < 0) || obj.hue > 65535) {
-        throw new RangeError(
-          "Invalid color hue given for setColor LIFX packet, must be a number between 0 and 65535"
-        );
-      }
+    toBuffer: (obj, buf, offset) => {
+      validate.isUInt16(obj.hue, 'setTileState64:HSBK:hue');
       buf.writeUInt16LE(obj.hue, offset);
       offset += 2;
-    
-      if (
-        (typeof obj.saturation !== "number" && obj.saturation < 0) ||
-        obj.saturation > 65535
-      ) {
-        throw new RangeError(
-          "Invalid color saturation given for setColor LIFX packet, must be a number between 0 and 65535"
-        );
-      }
+
+      validate.isUInt16(obj.saturation, 'setTileState64:HSBK:saturation');
       buf.writeUInt16LE(obj.saturation, offset);
       offset += 2;
-    
-      if (
-        (typeof obj.brightness !== "number" && obj.brightness < 0) ||
-        obj.brightness > 65535
-      ) {
-        throw new RangeError(
-          "Invalid color brightness given for setColor LIFX packet, must be a number between 0 and 65535"
-        );
-      }
+
+      validate.isUInt16(obj.brightness, 'setTileState64:HSBK:brightness');
       buf.writeUInt16LE(obj.brightness, offset);
       offset += 2;
-    
-      if (obj.kelvin === undefined) {
-        obj.kelvin = constants.HSBK_DEFAULT_KELVIN;
-      }
-      if (
-        (typeof obj.kelvin !== "number" && obj.kelvin < 2500) ||
-        obj.kelvin > 9000
-      ) {
-        throw new RangeError(
-          "Invalid color kelvin given for setColor LIFX packet, must be a number between 2500 and 9000"
-        );
-      }
+
+      validate.isUInt16(obj.kelvin, 'setTileState64:HSBK:kelvin');
       buf.writeUInt16LE(obj.kelvin, offset);
-      offset += 2;   
+      offset += 2;
+
       return offset;
     }
   }
 };
 
 /**
- * Converts packet specific data from a buffer to an object
- * @param  {Buffer} buf Buffer containing only packet specific data no header
- * @return {Object}     Information contained in packet
- */
-Packet.toObject = function(buf) {
-  throw new Error("toObject is not implemented setTileState64");
-};
-
-/**
  * Converts the given packet specific object into a packet
  * @param  {Object} obj object with configuration data
- * @param  {Object} obj.color an objects with colors to set
- * @param  {Number} obj.color.hue between 0 and 65535
- * @param  {Number} obj.color.saturation between 0 and 65535
- * @param  {Number} obj.color.brightness between 0 and 65535
- * @param  {Number} obj.color.kelvin between 2500 and 9000
+ * @param  {Number} obj.tileIndex 8bit value
+ * @param  {Number} obj.length 8bit value
+ * @param  {Number} obj.reserved 8bit value
+ * @param  {Number} obj.x 8bit value
+ * @param  {Number} obj.y 8bit value
+ * @param  {Number} obj.width 8bit value
+ * @param  {Number} obj.duration 8bit value
  * @param  {Number} [obj.duration] transition time in milliseconds
+ * @param  {Array} obj.colors an array of HSBK values
  * @return {Buffer} packet
  */
 Packet.toBuffer = function(obj) {
@@ -79,8 +46,11 @@ Packet.toBuffer = function(obj) {
   buf.fill(0);
   let offset = 0;
 
+  ['tileIndex', 'length', 'reserved', 'x', 'y', 'width'].forEach((field) => {
+    validate.isUInt8(obj[field], `setTileState64:${field}`);
+  });
   // obj.stream field has unknown function so leave it as 0
-  buf.writeUInt8(obj.tile_index, offset);
+  buf.writeUInt8(obj.tileIndex, offset);
   offset += 1;
   buf.writeUInt8(obj.length, offset);
   offset += 1;
@@ -92,10 +62,11 @@ Packet.toBuffer = function(obj) {
   offset += 1;
   buf.writeUInt8(obj.width, offset);
   offset += 1;
+  validate.isUInt32(obj.duration, 'setTileState64:duration');
   buf.writeUInt32LE(obj.duration, offset);
   offset += 4;
-  obj.colors.forEach(color => {
-    offset = Packet.HSBK.toBuffer(color, buf, offset); 
+  obj.colors.forEach((color) => {
+    offset = Packet.HSBK.toBuffer(color, buf, offset);
   });
   return buf;
 };

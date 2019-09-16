@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-const { packet, constants, validate, utils } = require("../lifx");
-const { assign, pick } = require("lodash");
+const {packet, constants, validate, utils} = require('../lifx');
+const {assign, pick} = require('lodash');
 
 /**
  * A representation of a light bulb
@@ -19,7 +19,7 @@ function Light(constr) {
   this.address = constr.address;
   this.port = constr.port;
   this.label = null;
-  this.status = "on";
+  this.status = 'on';
 
   this.seenOnDiscovery = constr.seenOnDiscovery;
 }
@@ -31,14 +31,10 @@ function Light(constr) {
  * @param {Function} [callback] called when light did receive message
  */
 Light.prototype.off = function(duration, callback) {
-  validate.optionalDuration(duration, "light off method");
-  validate.optionalCallback(callback, "light off method");
+  validate.optionalDuration(duration, 'light off method');
+  validate.optionalCallback(callback, 'light off method');
 
-  const packetObj = packet.create(
-    "setPower",
-    { level: 0, duration: duration },
-    this.client.source
-  );
+  const packetObj = packet.create('setPower', {level: 0, duration: duration}, this.client.source);
   packetObj.target = this.id;
   this.client.send(packetObj, callback);
 };
@@ -50,14 +46,10 @@ Light.prototype.off = function(duration, callback) {
  * @param {Function} [callback] called when light did receive message
  */
 Light.prototype.on = function(duration, callback) {
-  validate.optionalDuration(duration, "light on method");
-  validate.optionalCallback(callback, "light on method");
+  validate.optionalDuration(duration, 'light on method');
+  validate.optionalCallback(callback, 'light on method');
 
-  const packetObj = packet.create(
-    "setPower",
-    { level: 65535, duration: duration },
-    this.client.source
-  );
+  const packetObj = packet.create('setPower', {level: 65535, duration: duration}, this.client.source);
   packetObj.target = this.id;
   this.client.send(packetObj, callback);
 };
@@ -71,40 +63,25 @@ Light.prototype.on = function(duration, callback) {
  * @param {Number} [duration] transition time in milliseconds
  * @param {Function} [callback] called when light did receive message
  */
-Light.prototype.color = function(
-  hue,
-  saturation,
-  brightness,
-  kelvin,
-  duration,
-  callback
-) {
-  validate.colorHsb(hue, saturation, brightness, "light color method");
+Light.prototype.color = function(hue, saturation, brightness, kelvin, duration, callback) {
+  validate.colorHsb(hue, saturation, brightness, 'light color method');
 
-  validate.optionalKelvin(kelvin, "light color method");
-  validate.optionalDuration(duration, "light color method");
-  validate.optionalCallback(callback, "light color method");
+  validate.optionalKelvin(kelvin, 'light color method');
+  validate.optionalDuration(duration, 'light color method');
+  validate.optionalCallback(callback, 'light color method');
 
   // Convert HSB values to packet format
   hue = Math.round((hue / constants.HSBK_MAXIMUM_HUE) * 65535);
-  saturation = Math.round(
-    (saturation / constants.HSBK_MAXIMUM_SATURATION) * 65535
-  );
-  brightness = Math.round(
-    (brightness / constants.HSBK_MAXIMUM_BRIGHTNESS) * 65535
-  );
+  saturation = Math.round((saturation / constants.HSBK_MAXIMUM_SATURATION) * 65535);
+  brightness = Math.round((brightness / constants.HSBK_MAXIMUM_BRIGHTNESS) * 65535);
 
-  const packetObj = packet.create(
-    "setColor",
-    {
-      hue: hue,
-      saturation: saturation,
-      brightness: brightness,
-      kelvin: kelvin,
-      duration: duration
-    },
-    this.client.source
-  );
+  const packetObj = packet.create('setColor', {
+    hue: hue,
+    saturation: saturation,
+    brightness: brightness,
+    kelvin: kelvin,
+    duration: duration
+  }, this.client.source);
   packetObj.target = this.id;
   this.client.send(packetObj, callback);
 };
@@ -120,11 +97,11 @@ Light.prototype.color = function(
  * @param {Function} [callback] called when light did receive message
  */
 Light.prototype.colorRgb = function(red, green, blue, duration, callback) {
-  validate.colorRgb(red, green, blue, "light colorRgb method");
-  validate.optionalDuration(duration, "light colorRgb method");
-  validate.optionalCallback(callback, "light colorRgb method");
+  validate.colorRgb(red, green, blue, 'light colorRgb method');
+  validate.optionalDuration(duration, 'light colorRgb method');
+  validate.optionalCallback(callback, 'light colorRgb method');
 
-  const hsbObj = utils.rgbToHsb({ r: red, g: green, b: blue });
+  const hsbObj = utils.rgbToHsb({r: red, g: green, b: blue});
   this.color(hsbObj.h, hsbObj.s, hsbObj.b, 3500, duration, callback);
 };
 
@@ -137,14 +114,12 @@ Light.prototype.colorRgb = function(red, green, blue, duration, callback) {
  * @param {Function} [callback] called when light did receive message
  */
 Light.prototype.colorRgbHex = function(hexString, duration, callback) {
-  if (typeof hexString !== "string") {
-    throw new TypeError(
-      "LIFX light colorRgbHex method expects first parameter hexString to a string"
-    );
+  if (typeof hexString !== 'string') {
+    throw new TypeError('LIFX light colorRgbHex method expects first parameter hexString to a string');
   }
 
-  validate.optionalDuration(duration, "light colorRgbHex method");
-  validate.optionalCallback(callback, "light colorRgbHex method");
+  validate.optionalDuration(duration, 'light colorRgbHex method');
+  validate.optionalCallback(callback, 'light colorRgbHex method');
 
   const rgbObj = utils.rgbHexStringToObject(hexString);
   const hsbObj = utils.rgbToHsb(rgbObj);
@@ -157,25 +132,17 @@ Light.prototype.colorRgbHex = function(hexString, duration, callback) {
  * @param {Function} [callback] called when light did receive message
  */
 Light.prototype.maxIR = function(brightness, callback) {
-  validate.irBrightness(brightness, "light setMaxIR method");
+  validate.irBrightness(brightness, 'light setMaxIR method');
 
-  brightness = Math.round(
-    (brightness / constants.IR_MAXIMUM_BRIGHTNESS) * 65535
-  );
+  brightness = Math.round((brightness / constants.IR_MAXIMUM_BRIGHTNESS) * 65535);
 
-  if (callback !== undefined && typeof callback !== "function") {
-    throw new TypeError(
-      "LIFX light setMaxIR method expects callback to be a function"
-    );
+  if (callback !== undefined && typeof callback !== 'function') {
+    throw new TypeError('LIFX light setMaxIR method expects callback to be a function');
   }
 
-  const packetObj = packet.create(
-    "setInfrared",
-    {
-      brightness: brightness
-    },
-    this.client.source
-  );
+  const packetObj = packet.create('setInfrared', {
+    brightness: brightness
+  }, this.client.source);
   packetObj.target = this.id;
   this.client.send(packetObj, callback);
 };
@@ -185,39 +152,29 @@ Light.prototype.maxIR = function(brightness, callback) {
  * @param {Function} callback a function to accept the data
  */
 Light.prototype.getState = function(callback) {
-  validate.callback(callback, "light getState method");
+  validate.callback(callback, 'light getState method');
 
-  const packetObj = packet.create("getLight", {}, this.client.source);
+  const packetObj = packet.create('getLight', {}, this.client.source);
   packetObj.target = this.id;
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler(
-    "stateLight",
-    function(err, msg) {
-      if (err) {
-        return callback(err, null);
-      }
-      // Convert HSB to readable format
-      msg.color.hue = Math.round(
-        msg.color.hue * (constants.HSBK_MAXIMUM_HUE / 65535)
-      );
-      msg.color.saturation = Math.round(
-        msg.color.saturation * (constants.HSBK_MAXIMUM_SATURATION / 65535)
-      );
-      msg.color.brightness = Math.round(
-        msg.color.brightness * (constants.HSBK_MAXIMUM_BRIGHTNESS / 65535)
-      );
-      // Convert power to readable format
-      if (msg.power === 65535) {
-        msg.power = 1;
-      }
-      callback(null, {
-        color: msg.color,
-        power: msg.power,
-        label: msg.label
-      });
-    },
-    sqnNumber
-  );
+  this.client.addMessageHandler('stateLight', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    // Convert HSB to readable format
+    msg.color.hue = Math.round(msg.color.hue * (constants.HSBK_MAXIMUM_HUE / 65535));
+    msg.color.saturation = Math.round(msg.color.saturation * (constants.HSBK_MAXIMUM_SATURATION / 65535));
+    msg.color.brightness = Math.round(msg.color.brightness * (constants.HSBK_MAXIMUM_BRIGHTNESS / 65535));
+    // Convert power to readable format
+    if (msg.power === 65535) {
+      msg.power = 1;
+    }
+    callback(null, {
+      color: msg.color,
+      power: msg.power,
+      label: msg.label
+    });
+  }, sqnNumber);
 };
 
 /**
@@ -225,26 +182,20 @@ Light.prototype.getState = function(callback) {
  * @param  {Function} callback a function to accept the data
  */
 Light.prototype.getMaxIR = function(callback) {
-  validate.callback(callback, "light getMaxIR method");
+  validate.callback(callback, 'light getMaxIR method');
 
-  const packetObj = packet.create("getInfrared", {}, this.client.source);
+  const packetObj = packet.create('getInfrared', {}, this.client.source);
   packetObj.target = this.id;
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler(
-    "stateInfrared",
-    function(err, msg) {
-      if (err) {
-        return callback(err, null);
-      }
+  this.client.addMessageHandler('stateInfrared', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
 
-      msg.brightness = Math.round(
-        msg.brightness * (constants.HSBK_MAXIMUM_BRIGHTNESS / 65535)
-      );
+    msg.brightness = Math.round(msg.brightness * (constants.HSBK_MAXIMUM_BRIGHTNESS / 65535));
 
-      callback(null, msg.brightness);
-    },
-    sqnNumber
-  );
+    callback(null, msg.brightness);
+  }, sqnNumber);
 };
 
 /**
@@ -253,28 +204,25 @@ Light.prototype.getMaxIR = function(callback) {
  *                   message as parameters
  */
 Light.prototype.getHardwareVersion = function(callback) {
-  validate.callback(callback, "light getHardwareVersion method");
+  validate.callback(callback, 'light getHardwareVersion method');
 
-  const packetObj = packet.create("getVersion", {}, this.client.source);
+  const packetObj = packet.create('getVersion', {}, this.client.source);
   packetObj.target = this.id;
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler(
-    "stateVersion",
-    function(err, msg) {
-      if (err) {
-        return callback(err, null);
-      }
-      const versionInfo = pick(msg, ["vendorId", "productId", "version"]);
-      callback(
-        null,
-        assign(
-          versionInfo,
-          utils.getHardwareDetails(versionInfo.vendorId, versionInfo.productId)
-        )
-      );
-    },
-    sqnNumber
-  );
+  this.client.addMessageHandler('stateVersion', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    const versionInfo = pick(msg, [
+      'vendorId',
+      'productId',
+      'version'
+    ]);
+    callback(null, assign(
+      versionInfo,
+      utils.getHardwareDetails(versionInfo.vendorId, versionInfo.productId)
+    ));
+  }, sqnNumber);
 };
 
 /**
@@ -283,24 +231,18 @@ Light.prototype.getHardwareVersion = function(callback) {
  *                   message as parameters
  */
 Light.prototype.getUptime = function(callback) {
-  if (typeof callback !== "function") {
-    throw new TypeError(
-      "LIFX light getUptime method expects callback to be a function"
-    );
+  if (typeof callback !== 'function') {
+    throw new TypeError('LIFX light getUptime method expects callback to be a function');
   }
-  const packetObj = packet.create("getInfo", {}, this.client.source);
+  const packetObj = packet.create('getInfo', {}, this.client.source);
   packetObj.target = this.id;
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler(
-    "stateInfo",
-    function(err, msg) {
-      if (err) {
-        return callback(err, null);
-      }
-      callback(null, msg.uptime);
-    },
-    sqnNumber
-  );
+  this.client.addMessageHandler('stateInfo', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    callback(null, msg.uptime);
+  }, sqnNumber);
 };
 
 /**
@@ -308,15 +250,13 @@ Light.prototype.getUptime = function(callback) {
  * @param {Function} callback called when light did receive message
  */
 Light.prototype.reboot = function(callback) {
-  if (typeof callback !== "function") {
-    throw new TypeError(
-      "LIFX light reboot method expects callback to be a function"
-    );
+  if (typeof callback !== 'function') {
+    throw new TypeError('LIFX light reboot method expects callback to be a function');
   }
-  const packetObj = packet.create("rebootRequest", {}, this.client.source);
+  const packetObj = packet.create('rebootRequest', {}, this.client.source);
   packetObj.target = this.id;
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler("rebootResponse", callback, sqnNumber);
+  this.client.addMessageHandler('rebootResponse', callback, sqnNumber);
 };
 
 /**
@@ -324,21 +264,20 @@ Light.prototype.reboot = function(callback) {
  * @param {Function} callback a function to accept the data
  */
 Light.prototype.getFirmwareVersion = function(callback) {
-  validate.callback(callback, "light getFirmwareIgetFirmwareVersion method");
+  validate.callback(callback, 'light getFirmwareIgetFirmwareVersion method');
 
-  const packetObj = packet.create("getHostFirmware", {}, this.client.source);
+  const packetObj = packet.create('getHostFirmware', {}, this.client.source);
   packetObj.target = this.id;
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler(
-    "stateHostFirmware",
-    function(err, msg) {
-      if (err) {
-        return callback(err, null);
-      }
-      callback(null, pick(msg, ["majorVersion", "minorVersion"]));
-    },
-    sqnNumber
-  );
+  this.client.addMessageHandler('stateHostFirmware', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    callback(null, pick(msg, [
+      'majorVersion',
+      'minorVersion'
+    ]));
+  }, sqnNumber);
 };
 
 /**
@@ -346,21 +285,21 @@ Light.prototype.getFirmwareVersion = function(callback) {
  * @param {Function} callback a function to accept the data
  */
 Light.prototype.getFirmwareInfo = function(callback) {
-  validate.callback(callback, "light getFirmwareInfo method");
+  validate.callback(callback, 'light getFirmwareInfo method');
 
-  const packetObj = packet.create("getHostInfo", {}, this.client.source);
+  const packetObj = packet.create('getHostInfo', {}, this.client.source);
   packetObj.target = this.id;
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler(
-    "stateHostInfo",
-    function(err, msg) {
-      if (err) {
-        return callback(err, null);
-      }
-      callback(null, pick(msg, ["signal", "tx", "rx"]));
-    },
-    sqnNumber
-  );
+  this.client.addMessageHandler('stateHostInfo', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    callback(null, pick(msg, [
+      'signal',
+      'tx',
+      'rx'
+    ]));
+  }, sqnNumber);
 };
 
 /**
@@ -368,21 +307,21 @@ Light.prototype.getFirmwareInfo = function(callback) {
  * @param {Function} callback a function to accept the data
  */
 Light.prototype.getWifiInfo = function(callback) {
-  validate.callback(callback, "light getWifiInfo method");
+  validate.callback(callback, 'light getWifiInfo method');
 
-  const packetObj = packet.create("getWifiInfo", {}, this.client.source);
+  const packetObj = packet.create('getWifiInfo', {}, this.client.source);
   packetObj.target = this.id;
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler(
-    "stateWifiInfo",
-    function(err, msg) {
-      if (err) {
-        return callback(err, null);
-      }
-      callback(null, pick(msg, ["signal", "tx", "rx"]));
-    },
-    sqnNumber
-  );
+  this.client.addMessageHandler('stateWifiInfo', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    callback(null, pick(msg, [
+      'signal',
+      'tx',
+      'rx'
+    ]));
+  }, sqnNumber);
 };
 
 /**
@@ -390,21 +329,20 @@ Light.prototype.getWifiInfo = function(callback) {
  * @param {Function} callback a function to accept the data
  */
 Light.prototype.getWifiVersion = function(callback) {
-  validate.callback(callback, "light getWifiVersion method");
+  validate.callback(callback, 'light getWifiVersion method');
 
-  const packetObj = packet.create("getWifiFirmware", {}, this.client.source);
+  const packetObj = packet.create('getWifiFirmware', {}, this.client.source);
   packetObj.target = this.id;
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler(
-    "stateWifiFirmware",
-    function(err, msg) {
-      if (err) {
-        return callback(err, null);
-      }
-      return callback(null, pick(msg, ["majorVersion", "minorVersion"]));
-    },
-    sqnNumber
-  );
+  this.client.addMessageHandler('stateWifiFirmware', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    return callback(null, pick(msg, [
+      'majorVersion',
+      'minorVersion'
+    ]));
+  }, sqnNumber);
 };
 
 /**
@@ -414,36 +352,26 @@ Light.prototype.getWifiVersion = function(callback) {
  * @return {Function} callback(err, label)
  */
 Light.prototype.getLabel = function(callback, cache) {
-  validate.callback(callback, "light getLabel method");
+  validate.callback(callback, 'light getLabel method');
 
-  if (cache !== undefined && typeof cache !== "boolean") {
-    throw new TypeError(
-      "LIFX light getLabel method expects cache to be a boolean"
-    );
+  if (cache !== undefined && typeof cache !== 'boolean') {
+    throw new TypeError('LIFX light getLabel method expects cache to be a boolean');
   }
   if (cache === true) {
-    if (typeof this.label === "string" && this.label.length > 0) {
+    if (typeof this.label === 'string' && this.label.length > 0) {
       return callback(null, this.label);
     }
   }
-  const packetObj = packet.create(
-    "getLabel",
-    {
-      target: this.id
-    },
-    this.client.source
-  );
+  const packetObj = packet.create('getLabel', {
+    target: this.id
+  }, this.client.source);
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler(
-    "stateLabel",
-    function(err, msg) {
-      if (err) {
-        return callback(err, null);
-      }
-      return callback(null, msg.label);
-    },
-    sqnNumber
-  );
+  this.client.addMessageHandler('stateLabel', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    return callback(null, msg.label);
+  }, sqnNumber);
 };
 
 /**
@@ -453,28 +381,18 @@ Light.prototype.getLabel = function(callback, cache) {
  * @param {Function} [callback] called when light did receive message
  */
 Light.prototype.setLabel = function(label, callback) {
-  if (label === undefined || typeof label !== "string") {
-    throw new TypeError(
-      "LIFX light setLabel method expects label to be a string"
-    );
+  if (label === undefined || typeof label !== 'string') {
+    throw new TypeError('LIFX light setLabel method expects label to be a string');
   }
-  if (Buffer.byteLength(label, "utf8") > 32) {
-    throw new RangeError(
-      "LIFX light setLabel method expects a maximum of 32 bytes as label"
-    );
+  if (Buffer.byteLength(label, 'utf8') > 32) {
+    throw new RangeError('LIFX light setLabel method expects a maximum of 32 bytes as label');
   }
   if (label.length < 1) {
-    throw new RangeError(
-      "LIFX light setLabel method expects a minimum of one char as label"
-    );
+    throw new RangeError('LIFX light setLabel method expects a minimum of one char as label');
   }
-  validate.optionalCallback(callback, "light setLabel method");
+  validate.optionalCallback(callback, 'light setLabel method');
 
-  const packetObj = packet.create(
-    "setLabel",
-    { label: label },
-    this.client.source
-  );
+  const packetObj = packet.create('setLabel', {label: label}, this.client.source);
   packetObj.target = this.id;
   this.client.send(packetObj, callback);
 };
@@ -484,21 +402,17 @@ Light.prototype.setLabel = function(label, callback) {
  * @param {Function} callback a function to accept the data
  */
 Light.prototype.getAmbientLight = function(callback) {
-  validate.callback(callback, "light getAmbientLight method");
+  validate.callback(callback, 'light getAmbientLight method');
 
-  const packetObj = packet.create("getAmbientLight", {}, this.client.source);
+  const packetObj = packet.create('getAmbientLight', {}, this.client.source);
   packetObj.target = this.id;
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler(
-    "stateAmbientLight",
-    function(err, msg) {
-      if (err) {
-        return callback(err, null);
-      }
-      return callback(null, msg.flux);
-    },
-    sqnNumber
-  );
+  this.client.addMessageHandler('stateAmbientLight', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    return callback(null, msg.flux);
+  }, sqnNumber);
 };
 
 /**
@@ -506,24 +420,20 @@ Light.prototype.getAmbientLight = function(callback) {
  * @param {Function} callback a function to accept the data
  */
 Light.prototype.getPower = function(callback) {
-  validate.callback(callback, "light getPower method");
+  validate.callback(callback, 'light getPower method');
 
-  const packetObj = packet.create("getPower", {}, this.client.source);
+  const packetObj = packet.create('getPower', {}, this.client.source);
   packetObj.target = this.id;
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler(
-    "statePower",
-    function(err, msg) {
-      if (err) {
-        return callback(err, null);
-      }
-      if (msg.level === 65535) {
-        msg.level = 1;
-      }
-      return callback(null, msg.level);
-    },
-    sqnNumber
-  );
+  this.client.addMessageHandler('statePower', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    if (msg.level === 65535) {
+      msg.level = 1;
+    }
+    return callback(null, msg.level);
+  }, sqnNumber);
 };
 
 /**
@@ -533,67 +443,47 @@ Light.prototype.getPower = function(callback) {
  * @param {Function} callback a function to accept the data
  */
 Light.prototype.getColorZones = function(startIndex, endIndex, callback) {
-  validate.zoneIndex(startIndex, "light getColorZones method");
-  validate.optionalZoneIndex(endIndex, "light getColorZones method");
-  validate.optionalCallback(callback, "light getColorZones method");
+  validate.zoneIndex(startIndex, 'light getColorZones method');
+  validate.optionalZoneIndex(endIndex, 'light getColorZones method');
+  validate.optionalCallback(callback, 'light getColorZones method');
 
-  const packetObj = packet.create("getColorZones", {}, this.client.source);
+  const packetObj = packet.create('getColorZones', {}, this.client.source);
   packetObj.target = this.id;
   packetObj.startIndex = startIndex;
   packetObj.endIndex = endIndex;
   const sqnNumber = this.client.send(packetObj);
   if (endIndex === undefined || startIndex === endIndex) {
-    this.client.addMessageHandler(
-      "stateZone",
-      function(err, msg) {
-        if (err) {
-          return callback(err, null);
-        }
-        // Convert HSB to readable format
-        msg.color.hue = Math.round(
-          msg.color.hue * (constants.HSBK_MAXIMUM_HUE / 65535)
-        );
-        msg.color.saturation = Math.round(
-          msg.color.saturation * (constants.HSBK_MAXIMUM_SATURATION / 65535)
-        );
-        msg.color.brightness = Math.round(
-          msg.color.brightness * (constants.HSBK_MAXIMUM_BRIGHTNESS / 65535)
-        );
-        callback(null, {
-          count: msg.count,
-          index: msg.index,
-          color: msg.color
-        });
-      },
-      sqnNumber
-    );
+    this.client.addMessageHandler('stateZone', function(err, msg) {
+      if (err) {
+        return callback(err, null);
+      }
+      // Convert HSB to readable format
+      msg.color.hue = Math.round(msg.color.hue * (constants.HSBK_MAXIMUM_HUE / 65535));
+      msg.color.saturation = Math.round(msg.color.saturation * (constants.HSBK_MAXIMUM_SATURATION / 65535));
+      msg.color.brightness = Math.round(msg.color.brightness * (constants.HSBK_MAXIMUM_BRIGHTNESS / 65535));
+      callback(null, {
+        count: msg.count,
+        index: msg.index,
+        color: msg.color
+      });
+    }, sqnNumber);
   } else {
-    this.client.addMessageHandler(
-      "stateMultiZone",
-      function(err, msg) {
-        if (err) {
-          return callback(err, null);
-        }
-        // Convert HSB values to readable format
-        msg.color.forEach(function(color) {
-          color.hue = Math.round(
-            color.hue * (constants.HSBK_MAXIMUM_HUE / 65535)
-          );
-          color.saturation = Math.round(
-            color.saturation * (constants.HSBK_MAXIMUM_SATURATION / 65535)
-          );
-          color.brightness = Math.round(
-            color.brightness * (constants.HSBK_MAXIMUM_BRIGHTNESS / 65535)
-          );
-        });
-        callback(null, {
-          count: msg.count,
-          index: msg.index,
-          color: msg.color
-        });
-      },
-      sqnNumber
-    );
+    this.client.addMessageHandler('stateMultiZone', function(err, msg) {
+      if (err) {
+        return callback(err, null);
+      }
+      // Convert HSB values to readable format
+      msg.color.forEach(function(color) {
+        color.hue = Math.round(color.hue * (constants.HSBK_MAXIMUM_HUE / 65535));
+        color.saturation = Math.round(color.saturation * (constants.HSBK_MAXIMUM_SATURATION / 65535));
+        color.brightness = Math.round(color.brightness * (constants.HSBK_MAXIMUM_BRIGHTNESS / 65535));
+      });
+      callback(null, {
+        count: msg.count,
+        index: msg.index,
+        color: msg.color
+      });
+    }, sqnNumber);
   }
 };
 
@@ -609,53 +499,32 @@ Light.prototype.getColorZones = function(startIndex, endIndex, callback) {
  * @param {Boolean} [apply=true] apply changes immediately or leave pending for next apply
  * @param {Function} [callback] called when light did receive message
  */
-Light.prototype.colorZones = function(
-  startIndex,
-  endIndex,
-  hue,
-  saturation,
-  brightness,
-  kelvin,
-  duration,
-  apply,
-  callback
-) {
-  validate.zoneIndex(startIndex, "color zones method");
-  validate.zoneIndex(endIndex, "color zones method");
-  validate.colorHsb(hue, saturation, brightness, "color zones method");
+Light.prototype.colorZones = function(startIndex, endIndex, hue, saturation, brightness, kelvin, duration, apply, callback) {
+  validate.zoneIndex(startIndex, 'color zones method');
+  validate.zoneIndex(endIndex, 'color zones method');
+  validate.colorHsb(hue, saturation, brightness, 'color zones method');
 
-  validate.optionalKelvin(kelvin, "color zones method");
-  validate.optionalDuration(duration, "color zones method");
-  validate.optionalBoolean(apply, "apply", "color zones method");
-  validate.optionalCallback(callback, "color zones method");
+  validate.optionalKelvin(kelvin, 'color zones method');
+  validate.optionalDuration(duration, 'color zones method');
+  validate.optionalBoolean(apply, 'apply', 'color zones method');
+  validate.optionalCallback(callback, 'color zones method');
 
   // Convert HSB values to packet format
   hue = Math.round((hue / constants.HSBK_MAXIMUM_HUE) * 65535);
-  saturation = Math.round(
-    (saturation / constants.HSBK_MAXIMUM_SATURATION) * 65535
-  );
-  brightness = Math.round(
-    (brightness / constants.HSBK_MAXIMUM_BRIGHTNESS) * 65535
-  );
+  saturation = Math.round((saturation / constants.HSBK_MAXIMUM_SATURATION) * 65535);
+  brightness = Math.round((brightness / constants.HSBK_MAXIMUM_BRIGHTNESS) * 65535);
 
-  const appReq =
-    apply === false
-      ? constants.APPLICATION_REQUEST_VALUES.NO_APPLY
-      : constants.APPLICATION_REQUEST_VALUES.APPLY;
-  const packetObj = packet.create(
-    "setColorZones",
-    {
-      startIndex: startIndex,
-      endIndex: endIndex,
-      hue: hue,
-      saturation: saturation,
-      brightness: brightness,
-      kelvin: kelvin,
-      duration: duration,
-      apply: appReq
-    },
-    this.client.source
-  );
+  const appReq = apply === false ? constants.APPLICATION_REQUEST_VALUES.NO_APPLY : constants.APPLICATION_REQUEST_VALUES.APPLY;
+  const packetObj = packet.create('setColorZones', {
+    startIndex: startIndex,
+    endIndex: endIndex,
+    hue: hue,
+    saturation: saturation,
+    brightness: brightness,
+    kelvin: kelvin,
+    duration: duration,
+    apply: appReq
+  }, this.client.source);
   packetObj.target = this.id;
   this.client.send(packetObj, callback);
 };
@@ -665,61 +534,46 @@ Light.prototype.colorZones = function(
  * @param {Function} callback a function to accept the data
  */
 Light.prototype.getDeviceChain = function(callback) {
-  validate.callback(callback, "light getDeviceChain method");
+  validate.callback(callback, 'light getDeviceChain method');
 
-  const packetObj = packet.create("getDeviceChain", {}, this.client.source);
+  const packetObj = packet.create('getDeviceChain', {}, this.client.source);
   packetObj.target = this.id;
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler(
-    "stateDeviceChain",
-    function(err, msg) {
-      if (err) {
-        return callback(err, null);
-      }
-      //console.log(msg);
-      return callback(null, msg);
-    },
-    sqnNumber
-  );
+  this.client.addMessageHandler('stateDeviceChain', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    return callback(null, msg);
+  }, sqnNumber);
 };
 
 /**
  * Sets Tile Position
- * @example light.setUserPosition(0, 12, 13, 0)
- * @param {number} tile_index	unsigned 8-bit integer
- * @param {number} user_x	32-bit float
- * @param {number} user_y	32-bit float
- * @param {number} reserved	16-bit integer
- * @param {Function} [callback] called when light did receive message
+ * @example light.setUserPosition(0, 12, 13, 0, () => {})
+ * @param {Number} tileIndex	unsigned 8-bit integer
+ * @param {Number} userX	32-bit float
+ * @param {Number} userY	32-bit float
+ * @param {Number} reserved	16-bit integer
+ * @param {Function} callback called when light did receive message
  */
-Light.prototype.setUserPosition = function(
-  tile_index,
-  user_x,
-  user_y,
-  reverse,
-  callback
-) {
-  if (tile_index === undefined || typeof tile_index !== "number") {
-    throw new TypeError("LIFX light setUserPosition tile_index to be a number");
+Light.prototype.setUserPosition = function(tileIndex, userX, userY, reserved, callback) {
+  if (tileIndex === undefined || typeof tileIndex !== 'number') {
+    throw new TypeError('LIFX light setUserPosition tileIndex to be a number');
   }
-  if (user_x === undefined || typeof user_x !== "number") {
-    throw new TypeError("LIFX light setUserPosition user_x to be a number");
+  if (userX === undefined || typeof userX !== 'number') {
+    throw new TypeError('LIFX light setUserPosition userX to be a number');
   }
-  if (user_y === undefined || typeof user_y !== "number") {
-    throw new TypeError("LIFX light setUserPosition user_y to be a number");
+  if (userY === undefined || typeof userY !== 'number') {
+    throw new TypeError('LIFX light setUserPosition userY to be a number');
   }
-  validate.optionalCallback(callback, "light setUserPosition method");
+  validate.optionalCallback(callback, 'light setUserPosition method');
 
-  const packetObj = packet.create(
-    "setUserPositiion",
-    {
-      tile_index,
-      user_x,
-      user_y,
-      reserved
-    },
-    this.client.source
-  );
+  const packetObj = packet.create('setUserPositiion', {
+    tileIndex,
+    userX,
+    userY,
+    reserved: reserved || 0
+  }, this.client.source);
   packetObj.target = this.id;
   this.client.send(packetObj, callback);
 };
@@ -729,55 +583,56 @@ Light.prototype.setUserPosition = function(
  *
  * Get the state of 64 pixels in the tile in a rectangle that has
  * a starting point and width.
- * The tile_index is used to control the starting tile in the chain
+ * The tileIndex is used to control the starting tile in the chain
  * and length is used to get the state of that many tiles beginning
- * from the tile_index. This will result in a separate response from
+ * from the tileIndex. This will result in a separate response from
  * each tile.
  * For the LIFX Tile it really only makes sense to set x and y to
  * zero, and width to 8.
- * @param {number} tile_index	unsigned 8-bit integer
- * @param {number} length	unsigned 8-bit integer
- * @param {number} x	unsigned 8-bit integer
- * @param {number} y	unsigned 8-bit integer
- * @param {number} width	unsigned 8-bit integer
- * @param {number} reserved	unsigned 8-bit integer
+ * @param {Number} tileIndex	unsigned 8-bit integer
+ * @param {Number} length	unsigned 8-bit integer
+ * @param {Number} x	unsigned 8-bit integer
+ * @param {Number} y	unsigned 8-bit integer
+ * @param {Number} width	unsigned 8-bit integer
+ * @param {Number} reserved	unsigned 8-bit integer
  * @param {Function} callback a function to accept the data
  */
-Light.prototype.getTileState64 = function(
-  tile_index,
-  length,
-  x,
-  y,
-  width,
-  callback
-) {
-  validate.callback(callback, "light getTileState64 method");
+Light.prototype.getTileState64 = function(tileIndex, length, x, y, width, reserved, callback) {
+  if (tileIndex === undefined || typeof tileIndex !== 'number') {
+    throw new TypeError('LIFX light getTileState64 tileIndex to be a number');
+  }
+  if (length === undefined || typeof length !== 'number') {
+    throw new TypeError('LIFX light getTileState64 length to be a number');
+  }
+  if (x === undefined || typeof x !== 'number') {
+    throw new TypeError('LIFX light getTileState64 x to be a number');
+  }
+  if (y === undefined || typeof y !== 'number') {
+    throw new TypeError('LIFX light getTileState64 y to be a number');
+  }
+  if (width === undefined || typeof width !== 'number') {
+    throw new TypeError('LIFX light getTileState64 width to be a number');
+  }
+  validate.callback(callback, 'light getTileState64 method');
 
-  const packetObj = packet.create(
-    "getTileState64",
-    {
-      tile_index,
-      length,
-      reserved: 0,
-      x,
-      y,
-      width
-    },
-    this.client.source
+  const packetObj = packet.create('getTileState64', {
+    tileIndex,
+    length,
+    reserved: reserved || 0,
+    x,
+    y,
+    width
+  },
+  this.client.source
   );
   packetObj.target = this.id;
-  console.log(packetObj);
   const sqnNumber = this.client.send(packetObj);
-  this.client.addMessageHandler(
-    "stateTileState64",
-    function(err, msg) {
-      if (err) {
-        return callback(err, null);
-      }
-      return callback(null, msg);
-    },
-    sqnNumber
-  );
+  this.client.addMessageHandler('stateTileState64', function(err, msg) {
+    if (err) {
+      return callback(err, null);
+    }
+    return callback(null, msg);
+  }, sqnNumber);
 };
 
 /**
@@ -785,62 +640,49 @@ Light.prototype.getTileState64 = function(
  * a rectangle with the specified width.
  * For the LIFX Tile it really only makes sense to set x
  * and y to zero, and width to 8.
- * @param {number} tile_index	unsigned 8-bit integer
- * @param {number} length	unsigned 8-bit integer
- * @param {number} x	unsigned 8-bit integer
- * @param {number} y	unsigned 8-bit integer
- * @param {number} width	unsigned 8-bit integer
- * @param {number} duration	unsigned 32-bit integer
- * @param {number} colors[64]	64 HSBK values
+ * @param {Number} tileIndex	unsigned 8-bit integer
+ * @param {Number} length	unsigned 8-bit integer
+ * @param {Number} x	unsigned 8-bit integer
+ * @param {Number} y	unsigned 8-bit integer
+ * @param {Number} width	unsigned 8-bit integer
+ * @param {Number} duration	unsigned 32-bit integer
+ * @param {Number} colors[64]	64 HSBK values
+ * @param {Number} reserved	unsigned 8-bit integer
  * @param {Function} [callback] called when light did receive message
- * @param {number} reserved	unsigned 8-bit integer
  */
-Light.prototype.setTileState64 = function(
-  tile_index,
-  length,
-  x,
-  y,
-  width,
-  duration,
-  colors,
-  callback
-) {
-  if (tile_index === undefined || typeof tile_index !== "number") {
-    throw new TypeError("LIFX light setTileState64 tile_index to be a number");
+Light.prototype.setTileState64 = function(tileIndex, length, x, y, width, duration, colors, reserved, callback) {
+  if (tileIndex === undefined || typeof tileIndex !== 'number') {
+    throw new TypeError('LIFX light setTileState64 tileIndex to be a number');
   }
-  if (length === undefined || typeof length !== "number") {
-    throw new TypeError("LIFX light setTileState64 length to be a number");
+  if (length === undefined || typeof length !== 'number') {
+    throw new TypeError('LIFX light setTileState64 length to be a number');
   }
-  if (x === undefined || typeof x !== "number") {
-    throw new TypeError("LIFX light setTileState64 x to be a number");
+  if (x === undefined || typeof x !== 'number') {
+    throw new TypeError('LIFX light setTileState64 x to be a number');
   }
-  if (y === undefined || typeof y !== "number") {
-    throw new TypeError("LIFX light setTileState64 y to be a number");
+  if (y === undefined || typeof y !== 'number') {
+    throw new TypeError('LIFX light setTileState64 y to be a number');
   }
-  if (width === undefined || typeof width !== "number") {
-    throw new TypeError("LIFX light setTileState64 width to be a number");
+  if (width === undefined || typeof width !== 'number') {
+    throw new TypeError('LIFX light setTileState64 width to be a number');
   }
-  if (duration === undefined || typeof duration !== "number") {
-    throw new TypeError("LIFX light setTileState64 duration to be a number");
+  if (duration === undefined || typeof duration !== 'number') {
+    throw new TypeError('LIFX light setTileState64 duration to be a number');
   }
-  if (!Array.isArray(colors)) {
-    throw new TypeError("LIFX light setTileState64 colors to be a array");
-  }
-  validate.optionalCallback(callback, "light setTileState64 method");
+  const set64colors = utils.buildColorsHsbk(colors, 64);
 
-  const packetObj = packet.create("setTileState64",
-    {
-      tile_index,
-      length,
-      reserve: 0,
-      x,
-      y,
-      width,
-      duration,
-      colors
-    },
-    this.client.source
-  );
+  validate.optionalCallback(callback, 'light setTileState64 method');
+
+  const packetObj = packet.create('setTileState64', {
+    tileIndex,
+    length,
+    reserved: reserved || 0,
+    x,
+    y,
+    width,
+    duration,
+    colors: set64colors
+  }, this.client.source);
   packetObj.target = this.id;
   this.client.send(packetObj, callback);
 };
