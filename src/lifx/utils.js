@@ -90,11 +90,14 @@ utils.isIpv4Format = function(ip) {
  */
 utils.to16Bitnumber = function(val, def) {
   if (typeof val !== 'number') {
-    if (typeof def !== 'number') {
+    if (typeof def === 'number') {
       val = def;
     } else {
       val = 0;
     }
+  }
+  if (val < 0) {
+    val = (-1 * val) + 0x10000;
   }
   return val & 0xffff;
 };
@@ -110,6 +113,9 @@ utils.to16Bitnumber = function(val, def) {
  * @return {Object} HSBK value
  */
 utils.toColorHsbk = function(color) {
+  if (typeof color !== 'object') {
+    throw new TypeError('LIFX util toColorHsbk expects colors to be an object');
+  }
   return {
     hue: utils.to16Bitnumber(color.hue, 0x8000),
     saturation: utils.to16Bitnumber(color.saturation, 0x8000),
@@ -126,12 +132,15 @@ utils.toColorHsbk = function(color) {
  * @return {array} colors array by the given size
  */
 utils.buildColorsHsbk = function(colors, size) {
+  if (!Array.isArray(colors)) {
+    throw new TypeError('LIFX util buildColorsHsbk expects colors to be an array');
+  }
   if (typeof size !== 'number') {
     size = 0;
   }
   return (new Array(size))
     .fill(undefined)
-    .map((_, idx) => this.to16Bitnumber(colors[idx]));
+    .map((_, idx) => this.toColorHsbk(colors[idx] || {}));
 };
 
 /**

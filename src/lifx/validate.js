@@ -82,8 +82,8 @@ validate.irBrightness = function(brightness, context) {
  * @param {String} context validation context
  */
 validate.optionalKelvin = function(kelvin, context) {
-  const message = 'LIFX %s expects kelvin to be a number between 2500 and 9000';
   if (kelvin !== undefined) {
+    const message = `LIFX %s expects kelvin to be a number between ${constants.HSBK_MINIMUM_KELVIN} and ${constants.HSBK_MAXIMUM_KELVIN}`;
     if (typeof kelvin !== 'number') {
       throwTypeError(message, context);
     } else if (kelvin < constants.HSBK_MINIMUM_KELVIN || kelvin > constants.HSBK_MAXIMUM_KELVIN) {

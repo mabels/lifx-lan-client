@@ -3,8 +3,8 @@
 const utils = require('../../').utils;
 const assert = require('chai').assert;
 
-suite('Utils', () => {
-  test('create a random hex string', () => {
+describe('Utils', () => {
+  it('create a random hex string', () => {
     const test1 = utils.getRandomHexString();
     assert.isString(test1);
     assert.equal(test1, test1.match(/^[0-9A-F]{8}$/)[0]);
@@ -14,7 +14,7 @@ suite('Utils', () => {
     assert.equal(test2, test2.match(/^[0-9A-F]{16}$/)[0]);
   });
 
-  test('getting host ips', () => {
+  it('getting host ips', () => {
     const hostIPs = utils.getHostIPs();
     assert.isArray(hostIPs);
     hostIPs.forEach((ip) => {
@@ -23,7 +23,7 @@ suite('Utils', () => {
     });
   });
 
-  test('validation of IPv4 ips', () => {
+  it('validation of IPv4 ips', () => {
     assert.isTrue(utils.isIpv4Format('255.255.255.255'));
     assert.isTrue(utils.isIpv4Format('98.139.180.149'));
     assert.isTrue(utils.isIpv4Format('0.0.0.0'));
@@ -40,7 +40,7 @@ suite('Utils', () => {
     assert.isFalse(utils.isIpv4Format('98.139.180.149:61500'));
   });
 
-  test('rgb hex string to object with decimal rgb values', () => {
+  it('rgb hex string to object with decimal rgb values', () => {
     assert.throw(() => {
       // No string as argument
       utils.rgbHexStringToObject(111);
@@ -73,7 +73,7 @@ suite('Utils', () => {
     assert.deepEqual(utils.rgbHexStringToObject('#d52664'), {r: 213, g: 38, b: 100});
   });
 
-  test('maximum number in array', () => {
+  it('maximum number in array', () => {
     let values = [24, 1, 18, 254, 255, 21, 0];
     assert.equal(utils.maxNumberInArray(values), 255);
     assert.equal(values[0], 24); // Keep original order
@@ -83,7 +83,7 @@ suite('Utils', () => {
     assert.equal(values[0], 0.25); // Keep original order
   });
 
-  test('minimum number in array', () => {
+  it('minimum number in array', () => {
     let values = [24, 1, 18, 254, 255, 21, 0];
     assert.equal(utils.minNumberInArray(values), 0);
     assert.equal(values[0], 24); // Keep original order
@@ -93,7 +93,7 @@ suite('Utils', () => {
     assert.equal(values[0], 0.25); // Keep original order
   });
 
-  test('rgb to hsb conversion', () => {
+  it('rgb to hsb conversion', () => {
     let rgbObj = {r: 255, g: 255, b: 255};
     assert.deepEqual(utils.rgbToHsb(rgbObj), {h: 0, s: 0, b: 100});
 
@@ -125,7 +125,7 @@ suite('Utils', () => {
     assert.deepEqual(utils.rgbToHsb(rgbObj), {h: 24, s: 43, b: 57});
   });
 
-  test('get hardware info', () => {
+  it('get hardware info', () => {
     const vendorId = 1;
     let hardwareId;
 
@@ -134,9 +134,11 @@ suite('Utils', () => {
       vendorName: 'LIFX',
       productName: 'Original 1000',
       productFeatures: {
+        chain: false,
         color: true,
         infrared: false,
-        multizone: false
+        multizone: false,
+        ['temperature_range']: [2500, 9000]
       }
     });
 
@@ -145,9 +147,11 @@ suite('Utils', () => {
       vendorName: 'LIFX',
       productName: 'White 800 (Low Voltage)',
       productFeatures: {
+        chain: false,
         color: false,
         infrared: false,
-        multizone: false
+        multizone: false,
+        ['temperature_range']: [2700, 6500]
       }
     });
 
@@ -156,45 +160,45 @@ suite('Utils', () => {
     assert.equal(utils.getHardwareDetails(1, 0), false);
   });
 
-  test('to16Bitnumber without default', () => {
-    assert.equal(utils.to16number(6), 6);
-    assert.equal(utils.to16number(-6), 6);
-    assert.equal(utils.to16number('6'), 0);
+  it('to16Bitnumber without default', () => {
+    assert.equal(utils.to16Bitnumber(6), 6);
+    assert.equal(utils.to16Bitnumber(-6), 6);
+    assert.equal(utils.to16Bitnumber('6'), 0);
   });
 
-  test('to16Bitnumber with default not number', () => {
-    assert.equal(utils.to16number(6, 'xx'), 6);
-    assert.equal(utils.to16number(-6, 'xx'), 6);
-    assert.equal(utils.to16number('6', 'xx'), 0);
+  it('to16Bitnumber with default not number', () => {
+    assert.equal(utils.to16Bitnumber(6, 'xx'), 6);
+    assert.equal(utils.to16Bitnumber(-6, 'xx'), 6);
+    assert.equal(utils.to16Bitnumber('6', 'xx'), 0);
   });
 
-  test('to16Bitnumber with default number', () => {
-    assert.equal(utils.to16number(6, 9), 6);
-    assert.equal(utils.to16number(-6, 9), 6);
-    assert.equal(utils.to16number('6', 9), 9);
+  it('to16Bitnumber with default number', () => {
+    assert.equal(utils.to16Bitnumber(6, 9), 6);
+    assert.equal(utils.to16Bitnumber(-6, 9), 6);
+    assert.equal(utils.to16Bitnumber('6', 9), 9);
   });
 
-  test('to16Bitnumber with default number wrap', () => {
-    assert.equal(utils.to16number(6, 9 + 0xffff), 6);
-    assert.equal(utils.to16number(-6, 9 + 0xffff), 6);
-    assert.equal(utils.to16number('6', 9 + 0xffff), 9);
+  it('to16Bitnumber with default number wrap', () => {
+    assert.equal(utils.to16Bitnumber(6, 9 + 0xffff), 6);
+    assert.equal(utils.to16Bitnumber(-6, 9 + 0xffff), 6);
+    assert.equal(utils.to16Bitnumber('6', 9 + 0xffff), 8);
   });
 
-  test('toColorHsbk undefined', () => {
-    assert.throw(() => utils.toColorHskb(undefined));
+  it('toColorHsbk undefined', () => {
+    assert.throw(() => utils.toColorHsbk(undefined));
   });
 
-  test('toColorHsbk empty to defaults', () => {
-    assert.deepEqual(utils.toColorHskb({}), {
-      hue: -1,
-      saturation: -1,
-      brightness: -1,
-      kelvin: -1
+  it('toColorHsbk empty to defaults', () => {
+    assert.deepEqual(utils.toColorHsbk({}), {
+      hue: 32768,
+      saturation: 32768,
+      brightness: 32768,
+      kelvin: 3500
     });
   });
 
-  test('toColorHsbk set and passed', () => {
-    assert.deepEqual(utils.toColorHskb({
+  it('toColorHsbk set and passed', () => {
+    assert.deepEqual(utils.toColorHsbk({
       hue: 4711,
       saturation: 4712,
       brightness: 4713,
@@ -206,23 +210,31 @@ suite('Utils', () => {
       kelvin: 4714
     });
   });
-  
-  test('buildColorsHsbk undefined', () => {
+
+  it('buildColorsHsbk undefined', () => {
     assert.throw(() => utils.buildColorsHsbk());
   });
 
-  test('buildColorsHsbk empty', () => {
-    assert.deepEqual(utils.buildColorsHsbk([1,2]), []);
+  it('buildColorsHsbk empty', () => {
+    assert.deepEqual(utils.buildColorsHsbk([1, 2]), []);
   });
 
-  test('buildColorsHsbk def', () => {
+  it('buildColorsHsbk def and size', () => {
     assert.deepEqual(utils.buildColorsHsbk([{
       hue: 5674
     }], 2), [
       {
-        hue: 5674
+        brightness: 32768,
+        hue: 5674,
+        kelvin: 3500,
+        saturation: 32768
       },
-      {} 
+      {
+        brightness: 32768,
+        hue: 32768,
+        kelvin: 3500,
+        saturation: 32768
+      }
     ]);
   });
 });
