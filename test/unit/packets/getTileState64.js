@@ -3,20 +3,25 @@
 const Packet = require('../../../lib/lifx').packet;
 const assert = require('chai').assert;
 
-suite('Packet getTileState64', () => {
-  suite('create', () => {
-    test('getTileState64', () => {
+describe('Packet getTileState64', () => {
+  describe('create', () => {
+    it('getTileState64', () => {
       const packet = Packet.create('getTileState64', {
-        tileIndex: 4,
-        length: 4,
-        reserved: 4,
+        tileIndex: 1,
+        length: 2,
+        reserved: 3,
         x: 4,
-        y: 4,
-        width: 4,
+        y: 5,
+        width: 6
       });
-      assert.equal(packet.size, 0);
-      assert.equal(packet.level, 0);
-      assert.equal(packet.type, 117);
+      assert.equal(packet.size, 42);
+      assert.equal(packet.type, 707);
+      assert.equal(packet.tileIndex, 1);
+      assert.equal(packet.length, 2);
+      assert.equal(packet.reserved, 3);
+      assert.equal(packet.x, 4);
+      assert.equal(packet.y, 5);
+      assert.equal(packet.width, 6);
     });
   });
 });
