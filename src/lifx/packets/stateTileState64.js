@@ -27,7 +27,7 @@ const Packet = {
  */
 Packet.toObject = function(buf) {
   if (buf.length !== this.size) {
-    throw new Error('Invalid length given for stateTileState64 LIFX packet');
+    throw new Error(`Invalid length given for stateTileState64 LIFX packet:${buf.length}:${this.size}`);
   }
   let offset = 0;
   const obj = {};

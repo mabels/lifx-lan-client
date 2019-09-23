@@ -3,7 +3,8 @@
 const {validate} = require('../../lifx');
 
 const Packet = {
-  // size: 1 + 1 + 1 + 1 + 1 + 1 + 4 + 64 * (2 + 2 + 2 + 2),
+  size: (obj) => 1 + 1 + 1 + 1 + 1 + 1 + 4 +
+    (obj.colors.length * (2 + 2 + 2 + 2)),
   HSBK: {
     toBuffer: (obj, buf, offset) => {
       validate.isUInt16(obj.hue, 'setTileState64:HSBK:hue');
@@ -42,7 +43,7 @@ const Packet = {
  * @return {Buffer} packet
  */
 Packet.toBuffer = function(obj) {
-  const buf = new Buffer(this.size);
+  const buf = Buffer.alloc(Packet.size(obj));
   buf.fill(0);
   let offset = 0;
 

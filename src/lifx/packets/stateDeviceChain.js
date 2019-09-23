@@ -14,7 +14,7 @@ const Packet = {
       offset += 2;
       tile.accelMeasZ = buf.readUInt16LE(offset);
       offset += 2;
-      tile.reserved = buf.readUInt16LE(offset);
+      tile.reserved0 = buf.readUInt16LE(offset);
       offset += 2;
       tile.userX = buf.readUInt32LE(offset);
       offset += 4;
@@ -24,7 +24,7 @@ const Packet = {
       offset += 1;
       tile.height = buf.readUInt8(offset);
       offset += 1;
-      tile.reserved = buf.readUInt8(offset);
+      tile.reserved1 = buf.readUInt8(offset);
       offset += 1;
       tile.deviceVersionVendor = buf.readUInt32LE(offset);
       offset += 4;
@@ -34,19 +34,19 @@ const Packet = {
       offset += 4;
       tile.firmwareBuild = {
         low: buf.readUInt32LE(offset),
-        high: buf.readUInt32LE(offset + 2)
+        high: buf.readUInt32LE(offset + 4)
       };
       offset += 8;
-      tile.reserved = {
+      tile.reserved2 = {
         low: buf.readUInt32LE(offset),
-        high: buf.readUInt32LE(offset + 2)
+        high: buf.readUInt32LE(offset + 4)
       };
       offset += 8;
       tile.firmwareVersionMinor = buf.readUInt16LE(offset);
       offset += 2;
       tile.firmwareVersionMajor = buf.readUInt16LE(offset);
       offset += 2;
-      tile.reserved = buf.readUInt32LE(offset);
+      tile.reserved3 = buf.readUInt32LE(offset);
       offset += 4;
       return {offset, tile};
     }
@@ -60,7 +60,7 @@ const Packet = {
  */
 Packet.toObject = function(buf) {
   if (buf.length !== this.size) {
-    throw new Error('Invalid length given for stateLabel LIFX packet');
+    throw new Error(`Invalid length given for stateDeviceChain LIFX packet:${buf.length}:${this.size}`);
   }
   let offset = 0;
   const obj = {};
