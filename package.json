@@ -11,10 +11,8 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-eslint": "^10.0.3",
-    "babel-preset-env": "^1.7.0",
+    "@types/node": "^13.9.0",
+    "typescript": "^3.8.3",
     "chai": "^4.2.0",
     "codecov.io": "^0.1.6",
     "eslint": "^5.16.0",
@@ -40,7 +38,7 @@
   ],
   "license": "MIT",
   "main": "./lib/lifx",
-  "types": "./lib/lifx.d.ts",
+  "types": "./src/lifx.d.ts",
   "engines": {
     "node": ">=4"
   },
@@ -49,17 +47,17 @@
     "url": "git+https://github.com/node-lifx/lifx-lan-client.git"
   },
   "scripts": {
-    "prepare": "npm run build",
-    "prebuild": "npm run clean && mkdirp lib/lifx && cp src/lifx/products.json lib/lifx",
-    "build": "npm run prebuild && babel src --out-dir lib",
-    "build:watch": "npm run build -- --watch",
-    "clean": "rimraf lib",
-    "lint": "eslint src/ test/ example/ cli.js",
-    "lint:fix": "npm run lint -- --fix",
-    "pretest": "npm run lint && npm run build",
-    "unittest": "mocha -u bdd -r babelhook --recursive test/unit/ || true",
-    "unittest:bail": "mocha -u bdd -r babelhook --recursive test/unit/ --bail || true",
-    "test": "istanbul cover -root lib/ node_modules/mocha/bin/_mocha -- -u bdd -r babelhook --recursive test/unit/",
-    "report-coverage": "cat ./coverage/coverage.json | node_modules/codecov.io/bin/codecov.io.js"
+    "xprepare": "npm run build",
+    "xprebuild": "npm run clean && mkdirp lib/lifx && cp src/lifx/products.json lib/lifx",
+    "xbuild": "npm run prebuild && babel src --out-dir lib",
+    "xbuild:watch": "npm run build -- --watch",
+    "xclean": "rimraf lib",
+    "xlint": "eslint src/ test/ example/ cli.js",
+    "xlint:fix": "npm run lint -- --fix",
+    "xpretest": "npm run lint && npm run build",
+    "xunittest": "mocha -u bdd -r babelhook --recursive test/unit/ || true",
+    "xunittest:bail": "mocha -u bdd -r babelhook --recursive test/unit/ --bail || true",
+    "xtest": "istanbul cover -root lib/ node_modules/mocha/bin/_mocha -- -u bdd -r babelhook --recursive test/unit/",
+    "xreport-coverage": "cat ./coverage/coverage.json | node_modules/codecov.io/bin/codecov.io.js"
   }
 }
